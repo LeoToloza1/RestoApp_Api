@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RestoApp_Api", "RestoApp_Api.csproj", "{B184442E-DC69-4134-9AA5-8205D365D08D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B184442E-DC69-4134-9AA5-8205D365D08D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B184442E-DC69-4134-9AA5-8205D365D08D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B184442E-DC69-4134-9AA5-8205D365D08D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B184442E-DC69-4134-9AA5-8205D365D08D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8703AF4-0217-4294-BBC4-E9D254D8483F}
+	EndGlobalSection
+EndGlobal
