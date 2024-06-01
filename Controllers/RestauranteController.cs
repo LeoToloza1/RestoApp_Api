@@ -9,6 +9,7 @@ namespace RestoApp_Api.Controllers
 
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "Restaurante")]
     public class RestauranteController : Controller
     {
         private readonly RepoRestaurante _repo;
@@ -32,7 +33,6 @@ namespace RestoApp_Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Restaurante")]
         public async Task<ActionResult> VerPerfil()
         {
             int idUsuario = GetUsuario();
@@ -42,6 +42,7 @@ namespace RestoApp_Api.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult> login(string email, string password)
         {
             bool acces = await _repo.Login(email, password);
@@ -64,6 +65,7 @@ namespace RestoApp_Api.Controllers
         }
 
         [HttpPost("registro")]
+        [AllowAnonymous]
         public async Task<ActionResult> Registrarse([FromForm] Restaurante restaurante)
         {
             if (!ModelState.IsValid)

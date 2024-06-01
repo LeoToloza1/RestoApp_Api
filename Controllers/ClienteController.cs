@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestoApp_Api.Repositorios;
 using RestoApp_Api.Servicio;
@@ -6,6 +7,7 @@ namespace RestoApp_Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "Cliente")]
     public class ClienteController : Controller
     {
         private readonly RepoCliente _repoCliente;
@@ -37,6 +39,7 @@ namespace RestoApp_Api.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult> login(string email, string password)
         {
             bool acces = await _repoCliente.Login(email, password);
@@ -59,6 +62,7 @@ namespace RestoApp_Api.Controllers
         }
 
         [HttpPost("registro")]
+        [AllowAnonymous]
         public async Task<ActionResult> Registrarse([FromForm] Cliente cliente)
         {
             if (!ModelState.IsValid)

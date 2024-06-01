@@ -12,6 +12,7 @@ namespace RestoApp_Api.Models
         [NotMapped]
         public IFormFile? imagenFile { get; set; }
         public int restaurante_id { get; set; }
+        [ForeignKey("restaurante_id")]
         public Restaurante? restaurante { get; set; }
         public bool borrado { get; set; }
 
