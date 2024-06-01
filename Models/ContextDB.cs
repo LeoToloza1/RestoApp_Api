@@ -10,15 +10,15 @@ namespace RestoApp_Api.Models
 
         }
 
-        public DbSet<Cliente> Clientes { get; set; }
-        public DbSet<Restaurante> Restaurantes { get; set; }
-        public DbSet<Rubro> Rubros { get; set; }
-        public DbSet<Pedido> Pedidos { get; set; }
-        public DbSet<Repartidor> Repartidores { get; set; }
-        public DbSet<Envio> Envios { get; set; }
-        public DbSet<Producto> Productos { get; set; }
-        public DbSet<PedidoProductos> PedidosProductos { get; set; }
-        public DbSet<Pago> Pagos { get; set; }
+        public DbSet<Cliente> Cliente { get; set; }
+        public DbSet<Restaurante> Restaurante { get; set; }
+        public DbSet<Rubro> Rubro { get; set; }
+        public DbSet<Pedido> Pedido { get; set; }
+        public DbSet<Repartidor> Repartidor { get; set; }
+        public DbSet<Envio> Envio { get; set; }
+        public DbSet<Producto> Producto { get; set; }
+        public DbSet<PedidoProductos> Pedido_Producto { get; set; }
+        public DbSet<Pago> Pago { get; set; }
 
     }
 

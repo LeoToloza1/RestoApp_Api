@@ -2,6 +2,8 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RestoApp_Api.Models;
+using RestoApp_Api.Repositorios;
+using RestoApp_Api.Servicio;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://localhost:5000", "https://localhost:5001", "http://*:5000", "https://*:5001");
@@ -14,6 +16,10 @@ var connectionString = builder.Configuration.GetConnectionString("Mysql");
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
 builder.Services.AddDbContext<ContextDB>(options => options.UseMySQL(connectionString));
 #pragma warning restore CS8604 // Posible argumento de referencia nulo
+
+builder.Services.AddScoped<RepoCliente>();
+builder.Services.AddScoped<Auth>();
+
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var SecretKey = jwtSettings["Key"];
 var issuer = jwtSettings["Issuer"];

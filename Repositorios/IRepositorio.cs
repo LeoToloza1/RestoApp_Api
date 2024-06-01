@@ -1,13 +1,12 @@
-
 namespace RestoApp_Api.Repositorios
 {
     public interface IRepositorio<T>
     {
-        List<T> ObtenerTodos();
-        List<T> ObtenerActivos();
-        bool Crear(T entity);
-        bool Actualizar(T entity);
-        bool EliminadoLogico(int id);
-        T BuscarPorId(int id);
+        Task<List<T>> ObtenerTodos();
+        Task<List<T>> ObtenerActivos();
+        Task<bool> Crear(T entity);
+        Task<bool> Actualizar(T entity);
+        Task<bool> EliminadoLogico(int id);
+        Task<T> BuscarPorId(int id);
     }
 }

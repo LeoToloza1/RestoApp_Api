@@ -6,7 +6,7 @@ namespace RestoApp_Api
     public class Cliente
     {
         [Column("id")]
-        int Id { get; set; }
+        public int Id { get; set; }
         [Column("nombre_cliente")]
         public string? Nombre_cliente { get; set; }
         [Column("apellido_cliente")]

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace RestoApp_Api.Models
 {
     public class Repartidor
@@ -11,6 +13,7 @@ namespace RestoApp_Api.Models
         public string? telefono_repartidor { get; set; }
         public string? avatarUrl { get; set; }
         public bool borrado { get; set; }
+        [NotMapped]
         public IFormFile? avatarFile { get; set; }
 
     }

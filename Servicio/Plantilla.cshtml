@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperación de contraseña</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f3f7;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f6f7f8;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .code {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0465c5;
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border: 2px solid #0a0a0a;
+            border-radius: 5px;
+        }
+
+        .btn {
+            font-family: monospace;
+            background-color: #f3f7fe;
+            color: #2671e9;
+            border: none;
+            border-radius: 8px;
+            width: 100px;
+            height: 45px;
+            transition: .3s;
+            margin: 8px;
+            padding: 1px;
+        }
+
+        .btn:hover {
+            background-color: #042b68;
+            box-shadow: 0 0 0 5px #3b83f65f;
+            color: #e6d9d9;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #888b8f;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>¡Hola, @Model.Nombre!</h2>
+        <p>Recibimos una solicitud para restablecer tu contraseña en Inmobiliaria T&L. Si no hiciste esta solicitud,
+            puedes
+            ignorar este correo electrónico.</p>
+        <p class="code">Para restablecer tu contraseña, haz clic en el siguiente botón:</p>
+        <p style="text-align: center;">
+            <a href="@Model.RecoveryUrl" class="btn">Recuperar Contraseña</a>
+        </p>
+        <p class="footer">Gracias,<br>El equipo de Inmobiliaria T&L</p>
+    </div>
+</body>
+
+</html>
