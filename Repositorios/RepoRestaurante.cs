@@ -7,72 +7,66 @@ using System.Threading.Tasks;
 
 namespace RestoApp_Api.Repositorios
 {
-    public class RepoCliente : IRepositorio<Cliente>
+    public class RepoRestaurante : IRepositorio<Restaurante>
     {
         private readonly ContextDB _context;
 
-        public RepoCliente(ContextDB context)
+        public RepoRestaurante(ContextDB context)
         {
             _context = context;
         }
 
-        public async Task<bool> Actualizar(Cliente entity)
+        public async Task<bool> Actualizar(Restaurante entity)
         {
-            _context.Set<Cliente>().Update(entity);
+            _context.Set<Restaurante>().Update(entity);
             return await _context.SaveChangesAsync() > 0;
         }
-
-        public async Task<Cliente> BuscarPorId(int id)
+        public async Task<Restaurante> BuscarPorId(int id)
         {
-            var cliente = await _context.Set<Cliente>().FindAsync(id);
-            if (cliente == null)
+            var restaurante = await _context.Set<Restaurante>().FindAsync(id);
+            if (restaurante == null)
             {
 
             }
 #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
-            return cliente;
+            return restaurante;
 #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
 
         }
-
-        public async Task<bool> Crear(Cliente entity)
+        public async Task<bool> Crear(Restaurante entity)
         {
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
             entity.Password = HashPass.HashearPass(entity.Password);
 #pragma warning restore CS8604 // Posible argumento de referencia nulo
-            await _context.Cliente.AddAsync(entity);
+            await _context.Restaurante.AddAsync(entity);
             return await _context.SaveChangesAsync() > 0;
         }
-
         public async Task<bool> EliminadoLogico(int id)
         {
-            var entity = await _context.Set<Cliente>().FindAsync(id);
+            var entity = await _context.Set<Restaurante>().FindAsync(id);
             if (entity == null)
                 return false;
-
             entity.borrado = true;
-            _context.Set<Cliente>().Update(entity);
+            _context.Set<Restaurante>().Update(entity);
             return await _context.SaveChangesAsync() > 0;
         }
-
-        public async Task<List<Cliente>> ObtenerActivos()
+        public async Task<List<Restaurante>> ObtenerActivos()
         {
-            return await _context.Set<Cliente>().Where(c => !c.borrado).ToListAsync();
+            return await _context.Set<Restaurante>().Where(r => !r.borrado).ToListAsync();
         }
-
-        public async Task<List<Cliente>> ObtenerTodos()
+        public async Task<List<Restaurante>> ObtenerTodos()
         {
-            return await _context.Set<Cliente>().ToListAsync();
+            return await _context.Set<Restaurante>().ToListAsync();
         }
         public async Task<bool> Login(string email, string password)
         {
-            var cliente = await _context.Cliente.SingleOrDefaultAsync(c => c.Email_cliente == email);
-            if (cliente == null)
+            var restaurante = await _context.Restaurante.SingleOrDefaultAsync(c => c.Email_restaurante == email);
+            if (restaurante == null)
             {
                 return false;
             }
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
-            bool acces = HashPass.VerificarPassword(password, cliente.Password);
+            bool acces = HashPass.VerificarPassword(password, restaurante.Password);
 #pragma warning restore CS8604 // Posible argumento de referencia nulo
             if (acces)
             {
@@ -81,26 +75,25 @@ namespace RestoApp_Api.Repositorios
 
             return false;
         }
-        public async Task<Cliente> buscarPorEmail(string email)
+        public async Task<Restaurante> buscarPorEmail(string email)
         {
 #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
-            return await _context.Cliente.FirstOrDefaultAsync(c => c.Email_cliente == email);
+            return await _context.Restaurante.FirstOrDefaultAsync(c => c.Email_restaurante == email);
 #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
         public async Task<bool> cambiarPassword(int id, string passwordNueva)
         {
-            var cliente = await BuscarPorId(id);
-            if (cliente == null)
+            var restaurante = await BuscarPorId(id);
+            if (restaurante == null)
             {
-                Console.WriteLine("No se encontró el cliente.");
+                Console.WriteLine("No se encontró el restaurante.");
                 return false;
             }
             string hashedPassword = HashPass.HashearPass(passwordNueva);
-            cliente.Password = hashedPassword;
+            restaurante.Password = hashedPassword;
             _context.SaveChanges();
             return true;
         }
-
 
     }
 }
