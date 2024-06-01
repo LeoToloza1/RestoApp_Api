@@ -24,14 +24,23 @@ namespace RestoApp_Api.Repositorios
 
         public async Task<Cliente> BuscarPorId(int id)
         {
+            var cliente = await _context.Set<Cliente>().FindAsync(id);
+            if (cliente == null)
+            {
+
+            }
 #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
-            return await _context.Set<Cliente>().FindAsync(id);
+            return cliente;
 #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+
         }
 
         public async Task<bool> Crear(Cliente entity)
         {
-            await _context.Set<Cliente>().AddAsync(entity);
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
+            entity.Password = HashPass.HashearPass(entity.Password);
+#pragma warning restore CS8604 // Posible argumento de referencia nulo
+            await _context.Cliente.AddAsync(entity);
             return await _context.SaveChangesAsync() > 0;
         }
 
