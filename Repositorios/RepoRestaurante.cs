@@ -23,10 +23,12 @@ namespace RestoApp_Api.Repositorios
         }
         public async Task<Restaurante> BuscarPorId(int id)
         {
-            var restaurante = await _context.Set<Restaurante>().FindAsync(id);
+            var restaurante = await _context.Restaurante
+              .Include(r => r.rubro)
+              .FirstOrDefaultAsync(r => r.id == id);
             if (restaurante == null)
             {
-
+                //devolver una exception
             }
 #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return restaurante;

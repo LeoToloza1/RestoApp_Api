@@ -19,6 +19,15 @@ builder.Services.AddDbContext<ContextDB>(options => options.UseMySQL(connectionS
 
 builder.Services.AddScoped<RepoCliente>();
 builder.Services.AddScoped<Auth>();
+builder.Services.AddScoped<RepoEnvio>();
+builder.Services.AddScoped<RepoPago>();
+builder.Services.AddScoped<RepoPedido>();
+builder.Services.AddScoped<RepoPedidoProducto>();
+builder.Services.AddScoped<RepoProducto>();
+builder.Services.AddScoped<RepoRepartidor>();
+builder.Services.AddScoped<RepoRestaurante>();
+builder.Services.AddScoped<RepoRubro>();
+
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var SecretKey = jwtSettings["Key"];

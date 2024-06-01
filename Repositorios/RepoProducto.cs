@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using RestoApp_Api.Models;
-using RestoApp_Api.Servicio;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RestoApp_Api.Repositorios
@@ -16,34 +16,59 @@ namespace RestoApp_Api.Repositorios
             _context = context;
         }
 
-        public Task<bool> Actualizar(Producto entity)
+        public async Task<bool> Actualizar(Producto entity)
         {
-            throw new NotImplementedException();
+            _context.Set<Producto>().Update(entity);
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public Task<Producto> BuscarPorId(int id)
+        public async Task<Producto> BuscarPorId(int id)
         {
-            throw new NotImplementedException();
+            var entity = await _context.Set<Producto>().FindAsync(id);
+#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
+            return entity; // Devuelve null si no encuentra el producto
+#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
-        public Task<bool> Crear(Producto entity)
+        public async Task<bool> Crear(Producto entity)
         {
-            throw new NotImplementedException();
+            await _context.Producto.AddAsync(entity);
+            return await _context.SaveChangesAsync() > 0;
         }
 
-        public Task<bool> EliminadoLogico(int id)
+        public async Task<bool> EliminadoLogico(int id)
         {
-            throw new NotImplementedException();
+            var entity = await _context.Set<Producto>().FindAsync(id);
+            if (entity == null)
+                return false;
+
+            entity.borrado = true;
+            _context.Set<Producto>().Update(entity);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        //metodos para un administrador del sistema
+        public async Task<List<Producto>> ObtenerActivos()
+        {
+            return await _context.Set<Producto>().Where(p => !p.borrado).ToListAsync();
         }
 
-        public Task<List<Producto>> ObtenerActivos()
+        public async Task<List<Producto>> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            return await _context.Set<Producto>().ToListAsync();
+        }
+        //metodos para el restuarante
+        public async Task<List<Producto>> ObtenerActivosPorRestaurante(int restauranteId)
+        {
+            return await _context.Set<Producto>()
+                .Where(p => !p.borrado && p.restaurante_id == restauranteId)
+                .ToListAsync();
         }
 
-        public Task<List<Producto>> ObtenerTodos()
+        public async Task<List<Producto>> ObtenerTodosPorRestaurante(int restauranteId)
         {
-            throw new NotImplementedException();
+            return await _context.Set<Producto>()
+                .Where(p => p.restaurante_id == restauranteId)
+                .ToListAsync();
         }
     }
 }

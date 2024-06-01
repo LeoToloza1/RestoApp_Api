@@ -9,7 +9,6 @@ namespace RestoApp_Api.Models
         {
 
         }
-
         public DbSet<Cliente> Cliente { get; set; }
         public DbSet<Restaurante> Restaurante { get; set; }
         public DbSet<Rubro> Rubro { get; set; }
@@ -17,9 +16,15 @@ namespace RestoApp_Api.Models
         public DbSet<Repartidor> Repartidor { get; set; }
         public DbSet<Envio> Envio { get; set; }
         public DbSet<Producto> Producto { get; set; }
-        public DbSet<PedidoProductos> Pedido_Producto { get; set; }
+        public DbSet<PedidoProductos> pedido_producto { get; set; }
         public DbSet<Pago> Pago { get; set; }
-
+        // protected override void OnModelCreating(ModelBuilder modelBuilder)
+        // {
+        //     modelBuilder.Entity<Restaurante>()
+        //         .HasOne(r => r.Rubro)
+        //         .WithMany()
+        //         .HasForeignKey(r => r.Id_rubro);
+        // }
     }
 
 }

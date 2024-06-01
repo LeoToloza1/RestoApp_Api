@@ -11,6 +11,7 @@ namespace RestoApp_Api.Models
         public string? imagenUrl { get; set; }
         [NotMapped]
         public IFormFile? imagenFile { get; set; }
+        public int restaurante_id { get; set; }
         public Restaurante? restaurante { get; set; }
         public bool borrado { get; set; }
 

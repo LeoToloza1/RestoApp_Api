@@ -1,12 +1,15 @@
 
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
+using RestoApp_Api.Models;
 
 namespace RestoApp_Api
 {
-    public class Cliente
+    public class Cliente : IUsuario
     {
         [Column("id")]
         public int Id { get; set; }
+        public int id => Id;
         [Column("nombre_cliente")]
         public string? Nombre_cliente { get; set; }
         [Column("apellido_cliente")]
@@ -23,7 +26,9 @@ namespace RestoApp_Api
         public bool borrado { get; set; }
         [NotMapped]
         public IFormFile? AvatarFile { get; set; }
-
-
+#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
+        public string Email => Email_cliente;
+#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+        public string NombreCompleto => $"{Nombre_cliente} {Apellido_cliente}";
     }
 }
