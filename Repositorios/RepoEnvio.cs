@@ -3,6 +3,7 @@ using RestoApp_Api.Models;
 using RestoApp_Api.Servicio;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RestoApp_Api.Repositorios
@@ -16,34 +17,79 @@ namespace RestoApp_Api.Repositorios
             _context = context;
         }
 
-        public Task<bool> Actualizar(Envio entity)
+        public async Task<bool> Actualizar(Envio entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.Envio.Update(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<Envio> BuscarPorId(int id)
+        public async Task<Envio> BuscarPorId(int id)
         {
-            throw new NotImplementedException();
+#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
+            return await _context.Envio
+                .Include(e => e.repartidor)
+                .Include(e => e.pedido)
+                .FirstOrDefaultAsync(e => e.id == id);
+#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
-        public Task<bool> Crear(Envio entity)
+        public async Task<bool> Crear(Envio entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _context.Envio.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<bool> EliminadoLogico(int id)
+        public async Task<bool> EliminadoLogico(int id)
         {
-            throw new NotImplementedException();
+            var entity = await _context.Envio.FindAsync(id);
+            if (entity == null)
+                return false;
+
+            entity.estado_envio = true;
+
+            try
+            {
+                _context.Envio.Update(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<List<Envio>> ObtenerActivos()
+        public async Task<List<Envio>> ObtenerActivos()
         {
-            throw new NotImplementedException();
+            return await _context.Envio
+                .Include(e => e.repartidor)
+                .Include(e => e.pedido)
+                .Where(envio => !envio.estado_envio)
+                .ToListAsync();
         }
 
-        public Task<List<Envio>> ObtenerTodos()
+        public async Task<List<Envio>> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            return await _context.Envio
+                .Include(e => e.repartidor)
+                .Include(e => e.pedido)
+                .ToListAsync();
         }
     }
 }

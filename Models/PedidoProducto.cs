@@ -1,9 +1,15 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace RestoApp_Api.Models
 {
     public class PedidoProductos
     {
+        [Key]
         public int id { get; set; }
+        [ForeignKey("pedido_id")]
         public Pedido? pedido { get; set; }
+        [ForeignKey("producto_id")]
         public Producto? producto { get; set; }
         public int cantidad { get; set; }
         public double costo_total { get; set; }

@@ -62,7 +62,50 @@ namespace RestoApp_Api.Controllers
             return Ok(p);
         }
         //--------------------------------------------------------------
-        [HttpGet("activos/{restauranteId}")]
+
+        [HttpPost("editar")]
+        [Authorize(Roles = "Restaurante")]
+        public async Task<ActionResult> EditarProducto([FromForm] Producto p)
+        {
+            int idRestaurante = GetUsuario();
+            p.restaurante_id = idRestaurante;
+            Producto pExistente = await _repoProducto.BuscarPorId(p.id);
+            if (pExistente == null)
+            {
+                return NotFound("El producto no existe.");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (p.imagenFile != null)
+            {
+                var result = await GuardarAvatar(p.imagenFile);
+                if (result.Item1)
+                {
+                    pExistente.imagenUrl = result.Item2;
+                }
+                else
+                {
+                    return BadRequest("El archivo proporcionado no es una imagen válida.");
+                }
+            }
+
+            pExistente.descripcion = p.descripcion;
+            pExistente.nombre_producto = p.nombre_producto;
+            pExistente.precio = p.precio;
+            pExistente.borrado = p.borrado;
+
+            bool exito = await _repoProducto.Actualizar(pExistente);
+            if (!exito)
+            {
+                return StatusCode(500, "Error al actualizar el producto.");
+            }
+
+            return Ok(pExistente);
+        }
+
+        [HttpGet("activos/{restauranteId}")]//en android despues sacar este parametro
         public async Task<ActionResult<List<Producto>>> ObtenerActivosPorRestaurante(int restauranteId)
         {
             var productos = await _repoProducto.ObtenerActivosPorRestaurante(restauranteId);
