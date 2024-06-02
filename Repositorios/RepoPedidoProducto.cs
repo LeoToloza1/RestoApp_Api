@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using RestoApp_Api.Models;
-using RestoApp_Api.Servicio;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RestoApp_Api.Repositorios
@@ -16,34 +16,88 @@ namespace RestoApp_Api.Repositorios
             _context = context;
         }
 
-        public Task<bool> Actualizar(PedidoProductos entity)
+        public async Task<bool> Actualizar(PedidoProductos entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.pedido_producto.Update(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<PedidoProductos> BuscarPorId(int id)
+        public async Task<PedidoProductos> BuscarPorId(int id)
         {
-            throw new NotImplementedException();
+#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
+            return await _context.pedido_producto
+                .Include(pp => pp.pedido)
+                .Include(pp => pp.producto)
+                .FirstOrDefaultAsync(pp => pp.id == id);
+#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
-        public Task<bool> Crear(PedidoProductos entity)
+        public async Task<bool> Crear(PedidoProductos entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _context.pedido_producto.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<bool> EliminadoLogico(int id)
+        public async Task<bool> EliminadoLogico(int id)
         {
-            throw new NotImplementedException();
+            var entity = await _context.pedido_producto.FindAsync(id);
+            if (entity == null)
+                return false;
+
+            try
+            {
+                _context.pedido_producto.Remove(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<List<PedidoProductos>> ObtenerActivos()
+        public async Task<List<PedidoProductos>> ObtenerActivos()
         {
-            throw new NotImplementedException();
+            return await _context.pedido_producto
+                .Include(pp => pp.pedido)
+                .Include(pp => pp.producto)
+                .ToListAsync();
         }
 
-        public Task<List<PedidoProductos>> ObtenerTodos()
+        public async Task<List<PedidoProductos>> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            return await _context.pedido_producto
+                .Include(pp => pp.pedido)
+                .Include(pp => pp.producto)
+                .ToListAsync();
         }
+
+        public async Task<List<PedidoProductos>> ProdutosPorPedido(int id)
+        {
+            return await _context.pedido_producto
+                .Include(pp => pp.pedido)
+                .Include(pp => pp.producto)
+                .Where(pp => pp.pedido_id == id)
+                .ToListAsync();
+        }
+
+
+
     }
 }

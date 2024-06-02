@@ -11,5 +11,6 @@ namespace RestoApp_Api.Models
         [ForeignKey("cliente_id")]
         public Cliente? cliente { get; set; }
         public bool cancelado { get; set; }
+        public double total { get; set; }
     }
 }
