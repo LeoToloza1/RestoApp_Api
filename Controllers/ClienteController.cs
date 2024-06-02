@@ -34,13 +34,12 @@ namespace RestoApp_Api.Controllers
         {
             int idUsuario = GetUsuario();
             Cliente cliente = await _repoCliente.BuscarPorId(idUsuario);
-            cliente.Password = null;
             return Ok(cliente);
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult> login(string email, string password)
+        public async Task<ActionResult> login([FromForm] string email, [FromForm] string password)
         {
             bool acces = await _repoCliente.Login(email, password);
             Cliente cliente = await _repoCliente.buscarPorEmail(email);
@@ -89,7 +88,6 @@ namespace RestoApp_Api.Controllers
                 bool creado = await _repoCliente.Crear(cliente);
                 if (creado)
                 {
-                    cliente.Password = null;
                     return Ok(cliente);
                 }
                 else
@@ -147,7 +145,6 @@ namespace RestoApp_Api.Controllers
                 bool actualizado = await _repoCliente.Actualizar(clienteExistente);
                 if (actualizado)
                 {
-                    clienteExistente.Password = null; // No devolver la contraseña
                     return Ok(clienteExistente);
                 }
                 else

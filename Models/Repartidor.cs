@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace RestoApp_Api.Models
 {
@@ -8,6 +9,7 @@ namespace RestoApp_Api.Models
         public string? nombre_repartidor { get; set; }
         public string? apellido_repartidor { get; set; }
         public string? email_repartidor { get; set; }
+        [JsonIgnore]
         public string? password { get; set; }
         public string? direccion_repartidor { get; set; }
         public string? telefono_repartidor { get; set; }

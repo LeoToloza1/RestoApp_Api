@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using RestoApp_Api.Models;
 
 namespace RestoApp_Api
@@ -26,6 +27,7 @@ namespace RestoApp_Api
         public int id_rubro { get; set; }
 
         [Column("password")]
+        [JsonIgnore]
         public string? Password { get; set; }
 
         public string? logo_url { get; set; }

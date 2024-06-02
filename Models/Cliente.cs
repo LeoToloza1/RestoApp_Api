@@ -1,5 +1,6 @@
 
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using RestoApp_Api.Models;
 
@@ -7,9 +8,7 @@ namespace RestoApp_Api
 {
     public class Cliente : IUsuario
     {
-        [Column("id")]
-        public int Id { get; set; }
-        public int id => Id;
+        public int id { get; set; }
         [Column("nombre_cliente")]
         public string? Nombre_cliente { get; set; }
         [Column("apellido_cliente")]
@@ -17,6 +16,7 @@ namespace RestoApp_Api
         [Column("email_cliente")]
         public string? Email_cliente { get; set; }
         [Column("password")]
+        [JsonIgnore]
         public string? Password { get; set; }
         [Column("direccion_cliente")]
         public string? Direccion_cliente { get; set; }
