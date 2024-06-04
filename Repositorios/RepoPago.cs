@@ -16,34 +16,101 @@ namespace RestoApp_Api.Repositorios
             _context = context;
         }
 
-        public Task<bool> Actualizar(Pago entity)
+        public async Task<bool> Actualizar(Pago entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.Pago.Update(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<Pago> BuscarPorId(int id)
+        public async Task<Pago> BuscarPorId(int id)
         {
-            throw new NotImplementedException();
+#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
+            return await _context.Pago
+                .Include(e => e.pedido)
+                .FirstOrDefaultAsync(e => e.id == id);
+#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }
 
-        public Task<bool> Crear(Pago entity)
+        public async Task<bool> Crear(Pago entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _context.Pago.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<bool> EliminadoLogico(int id)
+        public async Task<bool> EliminadoLogico(int id)
         {
-            throw new NotImplementedException();
+            var entity = await _context.Pago.FindAsync(id);
+            if (entity == null)
+                return false;
+            entity.estado = true;
+            try
+            {
+                _context.Pago.Update(entity);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
+            }
         }
 
-        public Task<List<Pago>> ObtenerActivos()
+        public async Task<List<Pago>> ObtenerActivos()
         {
-            throw new NotImplementedException();
+            return await _context.Pago
+                .Include(e => e.pedido)
+                .Where(Pago => !Pago.estado)
+                .ToListAsync();
         }
 
-        public Task<List<Pago>> ObtenerTodos()
+        public async Task<List<Pago>> ObtenerTodos()
         {
-            throw new NotImplementedException();
+            return await _context.Pago
+                .Include(e => e.pedido)
+                .ToListAsync();
         }
+
+        public async Task<bool> PagarPedido(int id)
+        {
+            //uso de transaccion
+            using (var transaccion = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var pago = await BuscarPorId(id);
+                    if (!pago.estado)
+                    {
+                        pago.estado = true;
+                        await _context.SaveChangesAsync();
+                        await transaccion.CommitAsync();
+                    }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    await transaccion.RollbackAsync();
+                    return false;
+                }
+            }
+        }
+
+
     }
 }

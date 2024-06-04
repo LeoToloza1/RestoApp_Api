@@ -9,8 +9,10 @@ namespace RestoApp_Api.Models
         public double costo { get; set; }
         [ForeignKey("id_repartidor")]
         public Repartidor? repartidor { get; set; }
+        public int id_repartidor { get; set; }
         [ForeignKey("id_pedido")]
         public Pedido? pedido { get; set; }
+        public int id_pedido { get; set; }
         public bool estado_envio { get; set; }
     }
 }

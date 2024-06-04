@@ -16,12 +16,14 @@ namespace RestoApp_Api.Controllers
         private readonly RepoPedido _repoPedido;
         private readonly RepoPedidoProducto _repoPedidoProducto;
         private readonly RepoProducto _repoProducto;
+        private readonly RepoPago _repoPago;
 
-        public PedidoController(RepoPedido repoPedido, RepoPedidoProducto repoPedidoProducto, RepoProducto repoProducto)
+        public PedidoController(RepoPedido repoPedido, RepoPedidoProducto repoPedidoProducto, RepoProducto repoProducto, RepoPago repoPago)
         {
             _repoPedido = repoPedido;
             _repoPedidoProducto = repoPedidoProducto;
             _repoProducto = repoProducto;
+            _repoPago = repoPago;
         }
         private int GetUsuario()
         {
@@ -31,7 +33,6 @@ namespace RestoApp_Api.Controllers
             int userId = int.Parse(userIdClaim);
             return userId;
         }
-
 
         [HttpPost("crear")]
         public async Task<IActionResult> CrearPedido([FromBody] PedidoDTO pedidoDto)
@@ -43,70 +44,128 @@ namespace RestoApp_Api.Controllers
 
             int clienteId = GetUsuario();
 
-            var pedido = new Pedido
+            try
             {
-                cliente_id = clienteId,
-                detalle = pedidoDto.Detalle,
-                fecha_pedido = pedidoDto.FechaPedido,
-                total = 0 // Se calculará después
-            };
-
-            var creado = await _repoPedido.Crear(pedido);
-            if (!creado)
-            {
-                return StatusCode(500, "Error al crear el pedido.");
-            }
-
-            double total = 0;
-#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
-            foreach (var prodDto in pedidoDto.Productos)
-            {
-                var producto = await _repoProducto.BuscarPorId(prodDto.ProductoId);
-                if (producto == null)
+                var pedido = new Pedido
                 {
-                    return BadRequest($"Producto con ID {prodDto.ProductoId} no encontrado.");
-                }
-
-                var pedidoProducto = new PedidoProductos
-                {
-                    pedido_id = pedido.id,
-                    producto_id = prodDto.ProductoId,
-                    cantidad = prodDto.Cantidad,
-                    cancelado = false
+                    cliente_id = clienteId,
+                    detalle = pedidoDto.Detalle,
+                    fecha_pedido = pedidoDto.FechaPedido,
+                    total = 0 // Se calculará después
                 };
 
-                var productoCreado = await _repoPedidoProducto.Crear(pedidoProducto);
-                if (!productoCreado)
+                var creado = await _repoPedido.Crear(pedido);
+                if (!creado)
                 {
-                    return StatusCode(500, "Error al crear el producto del pedido.");
+                    return StatusCode(500, "Error al crear el pedido.");
                 }
 
-                total += producto.precio * prodDto.Cantidad;
-            }
+                double total = 0;
+
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+                foreach (var prodDto in pedidoDto.Productos)
+                {
+                    var producto = await _repoProducto.BuscarPorId(prodDto.ProductoId);
+                    if (producto == null)
+                    {
+                        return BadRequest($"Producto con ID {prodDto.ProductoId} no encontrado.");
+                    }
+
+                    var pedidoProducto = new PedidoProductos
+                    {
+                        pedido_id = pedido.id,
+                        producto_id = prodDto.ProductoId,
+                        cantidad = prodDto.Cantidad,
+                        precioUnit = producto.precio,
+                        cancelado = false
+                    };
+
+                    var productoCreado = await _repoPedidoProducto.Crear(pedidoProducto);
+                    if (!productoCreado)
+                    {
+                        return StatusCode(500, "Error al crear el producto del pedido.");
+                    }
+
+                    total += producto.precio * prodDto.Cantidad;
+                }
 #pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
 
-            pedido.total = total;
-            var actualizado = await _repoPedido.Actualizar(pedido);
-            if (!actualizado)
-            {
-                return StatusCode(500, "Error al actualizar el total del pedido.");
-            }
+                pedido.total = total;
+                var actualizado = await _repoPedido.Actualizar(pedido);
+                if (!actualizado)
+                {
+                    return StatusCode(500, "Error al actualizar el total del pedido.");
+                }
 
-            return Ok(pedido);
+                var pago = new Pago
+                {
+                    pedido_id = pedido.id,
+                    monto = pedido.total,
+                    estado = false // El estado inicial del pago
+                };
+
+                var pagoCreado = await _repoPago.Crear(pago);
+                if (!pagoCreado)
+                {
+                    return StatusCode(500, "Error al crear el pago.");
+                }
+
+
+                return Ok(pedido);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrió un error al crear el pedido: " + ex.Message);
+            }
         }
 
-
         [HttpGet("cliente")]
-        public async Task<ActionResult<List<Pedido>>> ObtenerPedidosPorCliente()
+        public async Task<ActionResult<List<PedidoDTO>>> ObtenerPedidosPorCliente()
         {
             int idCliente = GetUsuario();
             var pedidos = await _repoPedido.PedidosPorCliente(idCliente);
             if (pedidos == null || pedidos.Count == 0)
             {
-                return NotFound("El cliente aun no realizó pedidos");
+                return NotFound("El cliente aún no realizó pedidos");
             }
 
-            return Ok(pedidos);
+            var pedidosDto = new List<PedidoDTO>();
+
+            foreach (var pedido in pedidos)
+            {
+                var productosPedido = await _repoPedidoProducto.ProdutosPorPedido(pedido.id);
+
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+                var pedidoDto = new PedidoDTO
+                {
+                    id = pedido.id,
+                    Detalle = pedido.detalle,
+                    FechaPedido = pedido.fecha_pedido,
+                    total = pedido.total,
+                    clienteDTO = pedido.cliente != null ? new ClienteDTO
+                    {
+                        Id = pedido.cliente.id,
+                        Nombre_cliente = pedido.cliente.Nombre_cliente,
+                        Apellido_cliente = pedido.cliente.Apellido_cliente,
+                        Direccion_cliente = pedido.cliente.Direccion_cliente,
+                        Telefono_cliente = pedido.cliente.Telefono_cliente
+                    } : null,
+                    Productos = productosPedido.Select(pp => new ProductoDto
+                    {
+                        ProductoId = pp.producto.id,
+                        Nombre_producto = pp.producto?.nombre_producto,
+                        Precio = pp.producto.precio,
+                        Descripcion = pp.producto?.descripcion,
+                        ImagenUrl = pp.producto?.imagenUrl,
+                        Cantidad = pp.cantidad
+                    }).ToList()
+                };
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+
+                pedidosDto.Add(pedidoDto);
+            }
+
+            return Ok(pedidosDto);
         }
 
         [HttpPatch("cancelar/{id}")]
@@ -155,7 +214,7 @@ namespace RestoApp_Api.Controllers
             var result = ConstruirResultado(pedido, productosPedido);
             return Ok(result);
         }
-
+        //objeto anonimo usando dto para devolver un json para ver los datos que me interesan
         private object ConstruirResultado(Pedido pedido, List<PedidoProductos> productosPedido)
         {
             var pedidoDto = new PedidoDTO
@@ -178,7 +237,7 @@ namespace RestoApp_Api.Controllers
             {
                 ProductoId = pp.producto.id,
                 Nombre_producto = pp.producto?.nombre_producto,
-                Precio = pp.producto.precio,
+                Precio = pp.precioUnit,
                 Descripcion = pp.producto?.descripcion,
                 ImagenUrl = pp.producto?.imagenUrl,
                 Cantidad = pp.cantidad

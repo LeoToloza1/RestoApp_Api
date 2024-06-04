@@ -16,34 +16,46 @@ namespace RestoApp_Api.Repositorios
             _context = context;
         }
 
-        public Task<bool> Actualizar(Rubro entity)
+        public async Task<bool> Actualizar(Rubro entity)
         {
-            throw new NotImplementedException();
+            _context.Set<Rubro>().Update(entity);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<Rubro> BuscarPorId(int id)
+        {
+            var rubro = await _context.Rubro
+              .FirstOrDefaultAsync(r => r.id == id);
+            if (rubro == null)
+            {
+                //devolver una exception
+            }
+#pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
+            return rubro;
+#pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+
+        }
+        public async Task<bool> Crear(Rubro entity)
+        {
+            await _context.Rubro.AddAsync(entity);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<bool> EliminadoLogico(int id)
+        {
+            var entity = await _context.Set<Rubro>().FindAsync(id);
+            if (entity == null)
+                return false;
+            entity.borrado = true;
+            _context.Set<Rubro>().Update(entity);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<List<Rubro>> ObtenerActivos()
+        {
+            return await _context.Set<Rubro>().Where(r => !r.borrado).ToListAsync();
+        }
+        public async Task<List<Rubro>> ObtenerTodos()
+        {
+            return await _context.Set<Rubro>().ToListAsync();
         }
 
-        public Task<Rubro> BuscarPorId(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> Crear(Rubro entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> EliminadoLogico(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Rubro>> ObtenerActivos()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Rubro>> ObtenerTodos()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

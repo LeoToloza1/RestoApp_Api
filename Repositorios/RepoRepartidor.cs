@@ -10,10 +10,12 @@ namespace RestoApp_Api.Repositorios
     public class RepoRepartidor : IRepositorio<Repartidor>
     {
         private readonly ContextDB _context;
+        private readonly Random _random;
 
-        public RepoRepartidor(ContextDB context)
+        public RepoRepartidor(ContextDB context, Random r)
         {
             _context = context;
+            _random = r;
         }
 
         public async Task<bool> Actualizar(Repartidor entity)
@@ -93,6 +95,18 @@ namespace RestoApp_Api.Repositorios
             Repartidor.password = hashedPassword;
             _context.SaveChanges();
             return true;
+        }
+
+        public async Task<Repartidor> RepartidorAleatorio()
+        {
+            var repartidoresActivos = await ObtenerActivos();
+            if (repartidoresActivos.Count == 0)
+            {
+                throw new InvalidOperationException("No hay repartidores activos disponibles.");
+            }
+            int indiceAleatorio = _random.Next(0, repartidoresActivos.Count);
+            var repartidorAleatorio = repartidoresActivos[indiceAleatorio];
+            return repartidorAleatorio;
         }
 
     }

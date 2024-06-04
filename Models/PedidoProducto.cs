@@ -14,6 +14,7 @@ namespace RestoApp_Api.Models
         [ForeignKey("producto_id")]
         public Producto? producto { get; set; }
         public int cantidad { get; set; }
+        public double precioUnit { get; set; }
         public bool cancelado { get; set; }
 
     }
