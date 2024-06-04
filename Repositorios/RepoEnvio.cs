@@ -93,7 +93,14 @@ namespace RestoApp_Api.Repositorios
         }
 
 
-
+        public async Task<List<Envio>> ObtenerEnviosPendientes()
+        {
+            return await _context.Envio
+                .Include(e => e.repartidor)
+                .Include(e => e.pedido)
+                .Where(e => e.estado_envio == false)
+                .ToListAsync();
+        }
 
     }
 }

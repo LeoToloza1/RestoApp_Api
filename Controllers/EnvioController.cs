@@ -31,7 +31,7 @@ namespace RestoApp_Api.Controllers
                 {
                     id_pedido = id,
                     costo = pedido.total * 0.20,
-                    id_repartidor = repartidorAleatorio.id,
+                    repartidor_id = repartidorAleatorio.id,
                     fecha = DateTime.Now,
                 };
 
@@ -52,7 +52,21 @@ namespace RestoApp_Api.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> VerPedidosPendientes()
+        {
+            try
+            {
+                // Obtener los pedidos pendientes desde tu repositorio de envíos
+                var pedidosPendientes = await _repoEnvio.ObtenerEnviosPendientes();
 
+                return Ok(pedidosPendientes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener los pedidos pendientes: {ex.Message}");
+            }
+        }
 
     }
 }
