@@ -213,5 +213,34 @@ namespace RestoApp_Api.Controllers
             string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
             return allowedExtensions.Contains(extension);
         }
+
+        [HttpGet("Todos")]
+        [AllowAnonymous]
+        public async Task<IActionResult> verTodos()
+        {
+            List<Restaurante> lista = await _repo.ObtenerActivos();
+            return Ok(lista);
+
+        }
+        [HttpGet("buscar")]
+        [AllowAnonymous]
+        public async Task<IActionResult> BuscarPorNombre([FromQuery] string nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre))
+            {
+                return BadRequest("El nombre de búsqueda no puede estar vacío");
+            }
+
+            var restaurantes = await _repo.BuscarPorNombre(nombre);
+
+            if (restaurantes == null || !restaurantes.Any())
+            {
+                return NotFound(new { message = "No se encontraron restaurantes" });
+            }
+
+            return Ok(restaurantes);
+        }
+
+
     }
 }

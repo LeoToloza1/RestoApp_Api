@@ -54,7 +54,9 @@ namespace RestoApp_Api.Repositorios
         }
         public async Task<List<Restaurante>> ObtenerActivos()
         {
-            return await _context.Set<Restaurante>().Where(r => !r.borrado).ToListAsync();
+            return await _context.Set<Restaurante>()
+            .Include(r => r.rubro)
+            .Where(r => !r.borrado).ToListAsync();
         }
         public async Task<List<Restaurante>> ObtenerTodos()
         {
@@ -95,6 +97,16 @@ namespace RestoApp_Api.Repositorios
             restaurante.Password = hashedPassword;
             _context.SaveChanges();
             return true;
+        }
+
+        public async Task<List<Restaurante>> BuscarPorNombre(string nombre)
+        {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+            return await _context.Restaurante
+                .Include(r => r.rubro)
+                .Where(r => r.Nombre_restaurante.Contains(nombre))
+                .ToListAsync();
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
         }
 
     }

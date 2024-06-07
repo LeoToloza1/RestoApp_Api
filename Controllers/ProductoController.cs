@@ -120,6 +120,24 @@ namespace RestoApp_Api.Controllers
             return Ok(productos);
         }
 
+        [HttpGet("buscar")]
+        [AllowAnonymous]
+        public async Task<IActionResult> BuscarPorNombre([FromQuery] string nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre))
+            {
+                return BadRequest("El nombre de búsqueda no puede estar vacío");
+            }
+
+            var productos = await _repoProducto.BuscarPorNombre(nombre);
+
+            if (productos == null || !productos.Any())
+            {
+                return NotFound(new { message = "No se encontraron restaurantes" });
+            }
+
+            return Ok(productos);
+        }
         private async Task<(bool, string)> GuardarAvatar(IFormFile imagenFile)
         {
             if (!ImagenValida(imagenFile))

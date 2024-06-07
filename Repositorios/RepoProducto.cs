@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ZstdSharp.Unsafe;
 
 namespace RestoApp_Api.Repositorios
 {
@@ -61,6 +62,7 @@ namespace RestoApp_Api.Repositorios
         {
             return await _context.Set<Producto>()
                 .Where(p => !p.borrado && p.restaurante_id == restauranteId)
+                    .Include(p => p.restaurante)
                 .ToListAsync();
         }
 
@@ -68,7 +70,19 @@ namespace RestoApp_Api.Repositorios
         {
             return await _context.Set<Producto>()
                 .Where(p => p.restaurante_id == restauranteId)
+
                 .ToListAsync();
         }
+        public async Task<List<Producto>> BuscarPorNombre(string nombre)
+        {
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+            return await _context.Producto
+            .Where(p => p.nombre_producto.Contains(nombre))
+            .ToListAsync();
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+        }
+
+
+
     }
 }
