@@ -50,7 +50,7 @@ namespace RestoApp_Api.Controllers
                 {
                     cliente_id = clienteId,
                     detalle = pedidoDto.Detalle,
-                    fecha_pedido = pedidoDto.FechaPedido,
+                    fecha_pedido = DateTime.Today,
                     total = 0 // Se calculará después
                 };
 

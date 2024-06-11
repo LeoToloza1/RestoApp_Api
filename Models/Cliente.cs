@@ -27,8 +27,10 @@ namespace RestoApp_Api
         [NotMapped]
         public IFormFile? AvatarFile { get; set; }
 #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
+        [JsonIgnore]
         public string Email => Email_cliente;
 #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
+        [JsonIgnore]
         public string NombreCompleto => $"{Nombre_cliente} {Apellido_cliente}";
     }
 }

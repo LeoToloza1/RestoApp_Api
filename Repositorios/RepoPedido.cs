@@ -35,7 +35,7 @@ namespace RestoApp_Api.Repositorios
         {
 #pragma warning disable CS8603 // Posible tipo de valor devuelto de referencia nulo
             return await _context.Pedido
-                .Include(p => p.cliente) // Asumiendo que tienes una propiedad de navegación llamada "Cliente"
+                .Include(p => p.cliente)
                 .FirstOrDefaultAsync(p => p.id == id);
 #pragma warning restore CS8603 // Posible tipo de valor devuelto de referencia nulo
         }

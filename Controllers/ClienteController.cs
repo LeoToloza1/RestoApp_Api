@@ -116,16 +116,11 @@ namespace RestoApp_Api.Controllers
                 return NotFound("Usuario no encontrado.");
             }
 
-            clienteExistente.Nombre_cliente = cliente.Nombre_cliente;
-            clienteExistente.Apellido_cliente = cliente.Apellido_cliente;
-            clienteExistente.Email_cliente = cliente.Email_cliente;
-            clienteExistente.Direccion_cliente = cliente.Direccion_cliente;
-            clienteExistente.Telefono_cliente = cliente.Telefono_cliente;
-
-            if (!string.IsNullOrEmpty(cliente.Password))
-            {
-                clienteExistente.Password = HashPass.HashearPass(cliente.Password);
-            }
+            clienteExistente.Nombre_cliente = cliente.Nombre_cliente != null ? cliente.Nombre_cliente : clienteExistente.Nombre_cliente;
+            clienteExistente.Apellido_cliente = cliente.Apellido_cliente != null ? cliente.Apellido_cliente : clienteExistente.Apellido_cliente;
+            clienteExistente.Email_cliente = cliente.Email_cliente != null ? cliente.Email_cliente : clienteExistente.Email_cliente;
+            clienteExistente.Direccion_cliente = cliente.Direccion_cliente != null ? cliente.Direccion_cliente : clienteExistente.Direccion_cliente;
+            clienteExistente.Telefono_cliente = cliente.Telefono_cliente != null ? cliente.Telefono_cliente : clienteExistente.Telefono_cliente;
 
             if (cliente.AvatarFile != null)
             {
