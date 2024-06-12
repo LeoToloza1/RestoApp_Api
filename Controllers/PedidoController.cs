@@ -39,7 +39,10 @@ namespace RestoApp_Api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                Console.WriteLine(errors);
+                return BadRequest(new { Message = "Datos inválidos", Errors = errors });
+
             }
 
             int clienteId = GetUsuario();

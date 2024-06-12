@@ -9,5 +9,6 @@ namespace RestoApp_Api.Model
         public double total { get; set; }
         public DateTime FechaPedido { get; set; }
         public List<ProductoDto>? Productos { get; set; }
+
     }
 }
