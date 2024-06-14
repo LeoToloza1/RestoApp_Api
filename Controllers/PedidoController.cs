@@ -232,13 +232,9 @@ namespace RestoApp_Api.Controllers
             var cliente = await _repoCliente.BuscarPorId(idCliente);
             string templatePath = Path.Combine(hostingEnvironment.ContentRootPath, "EmailTemplatePedido.html");
             string templateContent = await System.IO.File.ReadAllTextAsync(templatePath);
-
-            // Reemplazar los marcadores en la plantilla HTML
             string mensajeHtml = templateContent
                 .Replace("{{NombreCliente}}", cliente.Nombre_cliente)
                 .Replace("{{TotalPedido}}", pedido.total.ToString("C"));
-
-            // Construir el HTML de los productos
             StringBuilder productosHtml = new StringBuilder();
 #pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
             foreach (var prod in pedido.Productos)
@@ -252,11 +248,7 @@ namespace RestoApp_Api.Controllers
         </tr>");
             }
 #pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
-
-            // Reemplazar el marcador en la plantilla con la tabla de productos
             mensajeHtml = mensajeHtml.Replace("{{TablaProductos}}", productosHtml.ToString());
-
-            // Enviar el correo
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
             bool enviado = _emailSender.SendEmail(cliente.Email_cliente, "Detalle del pedido", mensajeHtml);
 #pragma warning restore CS8604 // Posible argumento de referencia nulo
