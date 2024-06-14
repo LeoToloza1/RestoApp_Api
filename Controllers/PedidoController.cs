@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using RestoApp_Api.Model;
 using RestoApp_Api.Models;
 using RestoApp_Api.Repositorios;
+using RestoApp_Api.Servicio;
 using System.Collections;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace RestoApp_Api.Controllers
@@ -17,13 +19,19 @@ namespace RestoApp_Api.Controllers
         private readonly RepoPedidoProducto _repoPedidoProducto;
         private readonly RepoProducto _repoProducto;
         private readonly RepoPago _repoPago;
+        private readonly IWebHostEnvironment hostingEnvironment;
+        private readonly EmailSender _emailSender;
+        private readonly RepoCliente _repoCliente;
 
-        public PedidoController(RepoPedido repoPedido, RepoPedidoProducto repoPedidoProducto, RepoProducto repoProducto, RepoPago repoPago)
+        public PedidoController(RepoPedido repoPedido, RepoPedidoProducto repoPedidoProducto, RepoProducto repoProducto, RepoPago repoPago, IWebHostEnvironment env, EmailSender em, RepoCliente rp)
         {
             _repoPedido = repoPedido;
             _repoPedidoProducto = repoPedidoProducto;
             _repoProducto = repoProducto;
             _repoPago = repoPago;
+            hostingEnvironment = env;
+            _emailSender = em;
+            _repoCliente = rp;
         }
         private int GetUsuario()
         {
@@ -112,8 +120,8 @@ namespace RestoApp_Api.Controllers
                 {
                     return StatusCode(500, "Error al crear el pago.");
                 }
-
-
+                pedidoDto.total = total;
+                await EnviarMailConPedido(pedidoDto, clienteId);
                 return Ok(pedido);
             }
             catch (Exception ex)
@@ -217,6 +225,50 @@ namespace RestoApp_Api.Controllers
             var result = ConstruirResultado(pedido, productosPedido);
             return Ok(result);
         }
+
+        public async Task EnviarMailConPedido(PedidoDTO pedido, int idCliente)
+        {
+            var cliente = await _repoCliente.BuscarPorId(idCliente);
+            string templatePath = Path.Combine(hostingEnvironment.ContentRootPath, "EmailTemplatePedido.html");
+            string templateContent = await System.IO.File.ReadAllTextAsync(templatePath);
+
+            // Reemplazar los marcadores en la plantilla HTML
+            string mensajeHtml = templateContent
+                .Replace("{{NombreCliente}}", cliente.Nombre_cliente)
+                .Replace("{{TotalPedido}}", pedido.total.ToString("C"));
+
+            // Construir el HTML de los productos
+            StringBuilder productosHtml = new StringBuilder();
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+            foreach (var prod in pedido.Productos)
+            {
+                productosHtml.Append($@"
+        <tr>
+            <td>{prod.Nombre_producto}</td>
+            <td>{prod.Cantidad}</td>
+            <td>{prod.Precio.ToString("C")}</td>
+            <td>{(prod.Cantidad * prod.Precio).ToString("C")}</td>
+        </tr>");
+            }
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
+
+            // Reemplazar el marcador en la plantilla con la tabla de productos
+            mensajeHtml = mensajeHtml.Replace("{{TablaProductos}}", productosHtml.ToString());
+
+            // Enviar el correo
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
+            bool enviado = _emailSender.SendEmail(cliente.Email_cliente, "Detalle del pedido", mensajeHtml);
+#pragma warning restore CS8604 // Posible argumento de referencia nulo
+            if (!enviado)
+            {
+                throw new Exception("Error al enviar el correo de confirmación de pedido.");
+            }
+        }
+
+
+
+
+
         //objeto anonimo usando dto para devolver un json para ver los datos que me interesan
         private object ConstruirResultado(Pedido pedido, List<PedidoProductos> productosPedido)
         {

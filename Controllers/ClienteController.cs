@@ -13,11 +13,14 @@ namespace RestoApp_Api.Controllers
         private readonly RepoCliente _repoCliente;
         private readonly Auth _auth;
         private readonly IWebHostEnvironment hostingEnvironment;
-        public ClienteController(RepoCliente repositorio, Auth auth, IWebHostEnvironment webHostEnvironment)
+        private readonly EmailSender _emailSender;
+
+        public ClienteController(RepoCliente repositorio, Auth auth, IWebHostEnvironment webHostEnvironment, EmailSender emailSender)
         {
             this._repoCliente = repositorio;
             this._auth = auth;
             this.hostingEnvironment = webHostEnvironment;
+            _emailSender = emailSender;
 
         }
         private int GetUsuario()
@@ -166,6 +169,57 @@ namespace RestoApp_Api.Controllers
                 return StatusCode(500);
             }
         }
+
+        [HttpPost("recuperarPass")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Recovery([FromForm] string email)
+        {
+            try
+            {
+                var cliente = await _repoCliente.ObtenerPorEmail(email);
+                var dominio = hostingEnvironment.IsDevelopment() ? HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() : "www.restoapp.com.ar";
+
+                if (cliente != null)
+                {
+                    string token = GeneratePasswordResetToken();
+                    string templatePath = Path.Combine(hostingEnvironment.ContentRootPath, "EmailTemplate.html");
+                    string templateContent = System.IO.File.ReadAllText(templatePath);
+                    string mensajeHtml = templateContent.Replace("{{Token}}", token).Replace("{{Nombre}}", cliente.Nombre_cliente);
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
+                    bool enviado = _emailSender.SendEmail(cliente.Email_cliente, "Restablecer Contraseña", mensajeHtml);
+                    if (enviado)
+                    {
+                        await _repoCliente.cambiarPassword(cliente.id, token);
+                        return Ok("Se ha enviado un correo electrónico con una nueva contraseña, por favor revise su correo.");
+                    }
+                    else
+                    {
+                        return BadRequest("Error al enviar el correo electrónico para restablecer la contraseña.");
+                    }
+                }
+                else
+                {
+                    return NotFound("No se encontró ningún cliente con la dirección de correo electrónico proporcionada.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error al procesar la solicitud: " + ex.Message);
+            }
+        }
+
+        private string GeneratePasswordResetToken()
+        {
+            Random rand = new Random(Environment.TickCount);
+            string randomChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789";
+            string nuevaClave = "";
+            for (int i = 0; i < 8; i++)
+            {
+                nuevaClave += randomChars[rand.Next(0, randomChars.Length)];
+            }
+            return nuevaClave;
+        }
+
 
         private async Task<(bool, string)> GuardarAvatar(IFormFile avatarFile)
         {

@@ -7,5 +7,6 @@ namespace RestoApp_Api.Model
         public string? Apellido_cliente { get; set; }
         public string? Direccion_cliente { get; set; }
         public string? Telefono_cliente { get; set; }
+        public string? Email_cliente { get; set; }
     }
 }

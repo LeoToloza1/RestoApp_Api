@@ -19,6 +19,7 @@ builder.Services.AddDbContext<ContextDB>(options => options.UseMySQL(connectionS
 
 builder.Services.AddScoped<RepoCliente>();
 builder.Services.AddScoped<Auth>();
+builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<RepoEnvio>();
 builder.Services.AddScoped<RepoPago>();
 builder.Services.AddScoped<RepoPedido>();

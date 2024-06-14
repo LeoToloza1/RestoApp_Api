@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recuperación de contraseña</title>
+    <title>Detalle del Pedido</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -32,34 +32,21 @@
         margin-bottom: 15px;
       }
 
-      .code {
-        font-size: 20px;
-        font-weight: bold;
-        color: #0465c5;
-        text-align: center;
-        margin: 20px 0;
-        padding: 10px;
-        border: 2px solid #0a0a0a;
-        border-radius: 5px;
+      .pedido-detalles {
+        margin-top: 20px;
+        border-collapse: collapse;
+        width: 100%;
       }
 
-      .btn {
-        font-family: monospace;
-        background-color: #f3f7fe;
-        color: #2671e9;
-        border: none;
-        border-radius: 8px;
-        width: 100px;
-        height: 45px;
-        transition: 0.3s;
-        margin: 8px;
-        padding: 1px;
+      .pedido-detalles th,
+      .pedido-detalles td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
       }
 
-      .btn:hover {
-        background-color: #042b68;
-        box-shadow: 0 0 0 5px #3b83f65f;
-        color: #e6d9d9;
+      .pedido-detalles th {
+        background-color: #f2f2f2;
       }
 
       .footer {
@@ -69,20 +56,28 @@
       }
     </style>
   </head>
-
   <body>
     <div class="container">
-      <h2>¡Hola, {{Nombre}}</h2>
+      <h2>¡Hola, {{NombreCliente}}!</h2>
       <p>
-        Recibimos una solicitud para restablecer tu contraseña en {RestoApp}. Si
-        no hiciste esta solicitud, puedes ignorar este correo electrónico.
+        Gracias por tu pedido en RestoApp. A continuación el detalle completo de
+        tu pedido:
       </p>
-      <p class="code">Tu nueva contraseña es : {{Token}}</p>
-      <p style="text-align: center">
-        solicitamos que cuando accedas a la aplicacion, modifiques la contraseña
-        por una nueva que recuerdes.
-      </p>
-      <p class="footer">Gracias,<br />El equipo de {RestoApp}</p>
+      <table class="pedido-detalles">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{TablaProductos}}
+        </tbody>
+      </table>
+      <p>Total del pedido: <strong>{{TotalPedido}}</strong></p>
+      <p class="footer">Gracias,<br />El equipo de RestoApp</p>
     </div>
   </body>
 </html>

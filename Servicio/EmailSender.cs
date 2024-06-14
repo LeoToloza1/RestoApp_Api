@@ -18,7 +18,7 @@ public class EmailSender : ISender
         var from = _config["email"];
         var _password = _config["emailPass"];
         var smtpClient = _config["smptClient"];
-        var displayName = "Inmobiliaria T&L";
+        var displayName = "{RestoApp}";
 
         try
         {

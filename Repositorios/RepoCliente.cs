@@ -100,7 +100,18 @@ namespace RestoApp_Api.Repositorios
             _context.SaveChanges();
             return true;
         }
-
+        public async Task<Cliente> ObtenerPorEmail(string email)
+        {
+            try
+            {
+                var cliente = await _context.Cliente.SingleAsync(c => c.Email_cliente == email);
+                return cliente;
+            }
+            catch (InvalidOperationException)
+            {
+                throw new Exception("No se encontró ningún propietario registrado con el correo electrónico especificado.");
+            }
+        }
 
     }
 }
