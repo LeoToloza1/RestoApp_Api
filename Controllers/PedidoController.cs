@@ -226,6 +226,7 @@ namespace RestoApp_Api.Controllers
             return Ok(result);
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task EnviarMailConPedido(PedidoDTO pedido, int idCliente)
         {
             var cliente = await _repoCliente.BuscarPorId(idCliente);
@@ -264,10 +265,6 @@ namespace RestoApp_Api.Controllers
                 throw new Exception("Error al enviar el correo de confirmación de pedido.");
             }
         }
-
-
-
-
 
         //objeto anonimo usando dto para devolver un json para ver los datos que me interesan
         private object ConstruirResultado(Pedido pedido, List<PedidoProductos> productosPedido)
